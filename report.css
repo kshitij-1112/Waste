@@ -1,0 +1,722 @@
+/* Report Management Styling - Compact Design Like Repayment Tables */
+:root {
+  --primary: #2c3e50;
+  --secondary: #3498db;
+  --accent: #16a085;
+  --light: #f8f9fa;
+  --dark: #343a40;
+  --success: #27ae60;
+  --warning: #f39c12;
+  --danger: #e74c3c;
+  --info: #1abc9c;
+  --table-header-bg: linear-gradient(to right, #2c3e50, #3498db);
+  --pagination-border: #495057;
+  --pagination-bg: #f8f9fa;
+  --pagination-active-bg: #3498db;
+}
+
+body {
+  background-color: #f5f7fa;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px 0;
+}
+
+/* Main Content */
+.main-content {
+  padding: 20px 0;
+  min-height: 100vh;
+}
+
+/* Header Container - Reduced height, increased width with margins */
+.dashboard-header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 15px;
+  padding: 10px 25px; /* Reduced padding from 25px to 15px */
+  margin: 50px auto 30px auto;
+  /* Reduced margin from 25px to 15px */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 92%; /* Increased from 96% to 92% for more width with margins */
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 1.6rem; /* Reduced from 2rem */
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 1.5rem; /* Reduced from 1.8rem */
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.dashboard-header p {
+  margin: 8px 0 0 0; /* Reduced from 10px to 8px */
+  opacity: 0.9;
+  font-size: 1rem; /* Reduced from 1.1rem */
+}
+
+/* Report Type Controls - Moved closer to header */
+.report-type-controls {
+  max-width: 92%; /* Match header width */
+  margin: 10px auto; /* Reduced margin from 20px to 10px */
+  background-color: white;
+  border-radius: 12px;
+  padding: 15px 20px; /* Reduced padding from 20px to 15px */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.report-type-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.report-btn {
+  padding: 12px 20px; /* Reduced padding from 15px 25px */
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem; /* Reduced from 1rem */
+  transition: all 0.3s;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  min-width: 180px; /* Reduced from 200px */
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.report-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.report-btn:hover::before {
+  left: 100%;
+}
+
+.report-btn i {
+  font-size: 1rem; /* Reduced from 1.2rem */
+  margin-right: 8px; /* Reduced from 10px */
+}
+
+/* Report button colors */
+.btn-loan-report {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+}
+
+.btn-loan-report:hover,
+.btn-loan-report.active {
+  background: linear-gradient(135deg, #0984e3, #0770c4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(116, 185, 255, 0.4);
+  color: white;
+}
+
+.btn-repayment-report {
+  background: linear-gradient(135deg, #55efc4, #00b894);
+  color: white;
+}
+
+.btn-repayment-report:hover,
+.btn-repayment-report.active {
+  background: linear-gradient(135deg, #00b894, #00a085);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(85, 239, 196, 0.4);
+  color: white;
+}
+
+.btn-outstanding-report {
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  color: white;
+}
+
+.btn-outstanding-report:hover,
+.btn-outstanding-report.active {
+  background: linear-gradient(135deg, #e17055, #d63031);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(253, 203, 110, 0.4);
+  color: white;
+}
+
+/* Table Controls - Added exactly like repayment files */
+.table-controls {
+  background-color: white;
+  border-radius: 12px;
+  padding: 15px 20px; /* Reduced padding from 20px to 15px */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin: 10px auto; /* Reduced margin from 20px to 10px */
+  max-width: 92%; /* Match header width */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  min-height: 60px; /* Reduced from 70px */
+}
+
+.rows-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rows-control label {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.rows-control .form-select {
+  min-width: 80px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.rows-control .form-select:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+/* Controls Right Side */
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Table Container - Moved closer to controls */
+.table-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin: 10px auto; /* Reduced margin from 20px to 10px */
+  max-width: 92%; /* Match header width */
+  overflow: hidden;
+  border: 4px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section Header - Reduced height */
+.section-header {
+  background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+  padding: 15px 20px; /* Reduced padding from 20px 25px */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--primary);
+}
+
+.section-info h4 {
+  color: var(--primary);
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1rem; /* Reduced font size */
+}
+
+.section-info p {
+  margin: 3px 0 0 0; /* Reduced from 5px */
+  color: #7f8c8d;
+  font-size: 0.9rem; /* Reduced font size */
+}
+
+/* Export and Filter Controls */
+.export-filter-controls {
+  display: flex;
+  gap: 8px; /* Reduced from 10px */
+  align-items: center;
+}
+
+.btn-export {
+  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px; /* Reduced padding from 10px 20px */
+  font-weight: 600;
+  font-size: 0.85rem; /* Reduced font size */
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(162, 155, 254, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Reduced from 8px */
+}
+
+.btn-export:hover {
+  background: linear-gradient(135deg, #6c5ce7, #5f3dc4);
+  transform: translateY(-2px);
+  color: white;
+  box-shadow: 0 6px 12px rgba(162, 155, 254, 0.4);
+}
+
+.btn-filter {
+  background: linear-gradient(135deg, #81ecec, #00cec9);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px; /* Reduced padding from 10px 20px */
+  font-weight: 600;
+  font-size: 0.85rem; /* Reduced font size */
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(129, 236, 236, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Reduced from 8px */
+}
+
+.btn-filter:hover {
+  background: linear-gradient(135deg, #00cec9, #00b894);
+  transform: translateY(-2px);
+  color: white;
+  box-shadow: 0 6px 12px rgba(129, 236, 236, 0.4);
+}
+
+/* Table wrapper - Compact design exactly like repayment tables */
+.table-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: visible;
+}
+
+/* Table Styling - Exact same as repayment tables */
+.table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  table-layout: auto;
+  font-size: 0.85rem;
+}
+
+/* Responsive Column Widths - Percentage Based like repayment tables */
+.col-repayment-id,
+.col-loan-id,
+.col-customer-id {
+  width: 10%;
+  min-width: 80px;
+}
+
+.col-customer-name {
+  width: 12%;
+  min-width: 100px;
+}
+
+.col-product-type {
+  width: 12%;
+  min-width: 100px;
+}
+
+.col-product-name {
+  width: 15%;
+  min-width: 120px;
+}
+
+.col-due-date,
+.col-application-date,
+.col-payment-date {
+  width: 10%;
+  min-width: 90px;
+}
+
+.col-amount-due,
+.col-loan-amount,
+.col-outstanding-balance,
+.col-paid-amount {
+  width: 12%;
+  min-width: 100px;
+}
+
+.col-status {
+  width: 12%;
+  min-width: 100px;
+}
+
+.col-action {
+  width: 11%;
+  min-width: 90px;
+}
+
+/* Table Header - Compact Design exactly like repayment tables */
+.table thead {
+  background: var(--table-header-bg);
+}
+
+.table thead th {
+  background: var(--table-header-bg);
+  color: white;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 6px; /* Same as repayment tables */
+  text-transform: uppercase;
+  font-size: 0.7rem; /* Same as repayment tables */
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.table thead th:first-child {
+  border-left: none;
+}
+
+.table thead th:last-child {
+  border-right: none;
+}
+
+.table thead th i {
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.table tbody td {
+  padding: 8px 6px; /* Same as repayment tables */
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  vertical-align: middle;
+  font-size: 0.8rem; /* Same as repayment tables */
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  text-align: center; /* Center all table content */
+}
+
+.table tbody td:first-child {
+  border-left: none;
+}
+
+.table tbody td:last-child {
+  border-right: none;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(52, 152, 219, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badge - Exact same as repayment tables */
+.status-badge {
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  text-align: center;
+  min-width: 60px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.status-completed {
+  background-color: rgba(39, 174, 96, 0.2);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.status-pending {
+  background-color: rgba(243, 156, 18, 0.2);
+  color: var(--warning);
+  border: 1px solid var(--warning);
+}
+
+.status-overdue {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+/* Amount styling - Same as repayment tables */
+.amount {
+  font-weight: 700;
+  color: var(--success);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Pagination section - Minimal gap exactly like repayment tables */
+.pagination-section {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  padding: 8px 15px;
+  margin-top: 0;
+}
+
+.pagination-info {
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.pagination {
+  margin: 4px 0 0 0;
+  gap: 6px;
+  justify-content: center;
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.pagination .page-item {
+  display: inline-block;
+}
+
+.pagination .page-item .page-link {
+  color: #2c3e50;
+  background-color: var(--pagination-bg);
+  border: 3px solid #2c3e50;
+  padding: 8px 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  min-width: 40px;
+  min-height: 40px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.pagination .page-item.disabled .page-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #e9ecef;
+  border-color: #6c757d;
+  color: #495057;
+  transform: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.pagination .page-item.disabled .page-link:hover {
+  background-color: #e9ecef;
+  border-color: #6c757d;
+  color: #495057;
+  transform: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--pagination-active-bg);
+  color: white;
+  border-color: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(52, 152, 219, 0.4);
+  font-weight: 800;
+}
+
+.pagination .page-item.active .page-link:hover {
+  background-color: var(--secondary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.pagination .page-item:not(.disabled):not(.active) .page-link:hover {
+  background-color: #e9ecef;
+  border-color: var(--secondary);
+  color: var(--secondary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .table {
+    font-size: 0.8rem;
+  }
+
+  .table thead th {
+    padding: 6px 4px;
+    font-size: 0.65rem;
+  }
+
+  .table tbody td {
+    padding: 6px 4px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    min-height: 120px;
+  }
+
+  .controls-right {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    max-width: 98%;
+  }
+
+  .table {
+    min-width: 800px;
+  }
+
+  .dashboard-header {
+    margin: 15px auto;
+    padding: 15px;
+    max-width: 98%;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .report-type-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .report-btn {
+    min-width: 100%;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .pagination {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .pagination .page-item .page-link {
+    padding: 6px 10px;
+    min-width: 35px;
+    min-height: 35px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-header h1 {
+    font-size: 1.2rem;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dashboard-header p {
+    font-size: 0.9rem;
+  }
+
+  .table thead th {
+    padding: 4px 2px;
+    font-size: 0.6rem;
+  }
+
+  .table tbody td {
+    padding: 4px 2px;
+    font-size: 0.7rem;
+  }
+
+  .pagination .page-item .page-link {
+    padding: 4px 8px;
+    min-width: 30px;
+    min-height: 30px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Utility classes */
+.d-flex {
+  display: flex;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.fw-bold {
+  font-weight: 700;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.me-1 {
+  margin-right: 0.25rem;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.me-3 {
+  margin-right: 1rem;
+}
+
+/* Smooth transitions */
+* {
+  box-sizing: border-box;
+}
