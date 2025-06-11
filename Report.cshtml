@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- Table Controls - Added between header and table -->
+    <!-- Table Controls - Added between header and table, matching Repayment.pdf exactly -->
     <div class="table-controls">
         <div class="rows-control">
             <label for="rowsPerPage">
@@ -48,7 +48,7 @@
             </select>
         </div>
         <div class="controls-right">
-            <!-- Empty div to maintain layout structure -->
+            <!-- Empty to maintain layout like Repayment.pdf -->
         </div>
     </div>
 
@@ -61,13 +61,16 @@
 <script>
     // Global variables
     let currentReportType = 'loan';
-    let rowsPerPage = 10; // Default rows per page
+    let currentRowsPerPage = 10;
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Load loan report by default
-        showReport('loan');
-    });
+    function changeRowsPerPage() {
+        currentRowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
+        
+        // Update the current report's pagination
+        if (window.updateReportPagination) {
+            window.updateReportPagination(currentRowsPerPage);
+        }
+    }
 
     function showReport(type) {
         // Update button states
@@ -93,23 +96,13 @@
                     </div>
                 `);
             } else {
-                // After loading, update the rows per page for the loaded report
+                // After loading, apply current rows per page setting
                 setTimeout(() => {
-                    updateReportRowsPerPage();
+                    if (window.updateReportPagination) {
+                        window.updateReportPagination(currentRowsPerPage);
+                    }
                 }, 100);
             }
         });
-    }
-
-    function changeRowsPerPage() {
-        rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
-        updateReportRowsPerPage();
-    }
-
-    function updateReportRowsPerPage() {
-        // Update the rows per page in the currently loaded report
-        if (window.updateRowsPerPageFromParent) {
-            window.updateRowsPerPageFromParent(rowsPerPage);
-        }
     }
 </script>
