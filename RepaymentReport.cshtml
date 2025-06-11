@@ -42,6 +42,30 @@
         </div>
     </div>
 
+    <!-- Table Controls - Added to match Repayment.pdf -->
+    <div class="table-controls">
+        <div class="rows-control">
+            <label for="repaymentRowsPerPage">
+                <i class="fas fa-list-ol"></i>
+                Rows per page:
+            </label>
+            <select id="repaymentRowsPerPage" class="form-select" onchange="changeRowsPerPage()">
+                <option value="2">2</option>
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+            </select>
+        </div>
+
+        <div class="controls-right">
+            <div class="input-group search-input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="repaymentSearchInput" placeholder="Search repayments..." oninput="searchRepayments()">
+            </div>
+        </div>
+    </div>
+
     <div class="table-wrapper">
         <table class="table table-bordered" id="repaymentReportTable">
             <thead>
@@ -142,18 +166,24 @@
     let rowsPerPage = 10; // Default rows per page
     let allRows = [];
     let filteredRows = [];
-
-    // Function to update rows per page from parent
-    window.updateRowsPerPageFromParent = function(newRowsPerPage) {
-        rowsPerPage = newRowsPerPage;
-        currentPage = 1; // Reset to first page
-        updateTable();
-    };
+    let searchTerm = '';
 
     function initializePagination() {
         allRows = Array.from(document.querySelectorAll('.report-row'));
         filteredRows = [...allRows];
         updateTable();
+    }
+
+    function changeRowsPerPage() {
+        rowsPerPage = parseInt(document.getElementById('repaymentRowsPerPage').value);
+        currentPage = 1;
+        updateTable();
+    }
+
+    function searchRepayments() {
+        searchTerm = document.getElementById('repaymentSearchInput').value.toLowerCase();
+        currentPage = 1;
+        applyFilters();
     }
 
     function applyFilters() {
@@ -175,6 +205,15 @@
 
             let showRow = true;
 
+            // Apply search filter
+            if (searchTerm !== '') {
+                const text = row.textContent.toLowerCase();
+                if (!text.includes(searchTerm)) {
+                    showRow = false;
+                }
+            }
+
+            // Apply dropdown filters
             if (selectedStatus && status !== selectedStatus) {
                 showRow = false;
             }
@@ -199,6 +238,8 @@
     function clearFilters() {
         $("#statusFilter").val("");
         $("#paymentDateFilter").val("");
+        document.getElementById('repaymentSearchInput').value = '';
+        searchTerm = '';
 
         filteredRows = [...allRows];
         currentPage = 1;
