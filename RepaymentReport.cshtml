@@ -42,30 +42,6 @@
         </div>
     </div>
 
-    <!-- Table Controls - Added to match Repayment.pdf -->
-    <div class="table-controls">
-        <div class="rows-control">
-            <label for="repaymentRowsPerPage">
-                <i class="fas fa-list-ol"></i>
-                Rows per page:
-            </label>
-            <select id="repaymentRowsPerPage" class="form-select" onchange="changeRowsPerPage()">
-                <option value="2">2</option>
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-            </select>
-        </div>
-
-        <div class="controls-right">
-            <div class="input-group search-input-group">
-                <span class="input-group-text">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" class="form-control" id="repaymentSearchInput" placeholder="Search repayments..." oninput="searchRepayments()">
-            </div>
-        </div>
-    </div>
-
     <div class="table-wrapper">
         <table class="table table-bordered" id="repaymentReportTable">
             <thead>
@@ -166,24 +142,18 @@
     let rowsPerPage = 10; // Default rows per page
     let allRows = [];
     let filteredRows = [];
-    let searchTerm = '';
+
+    // Function to update rows per page from parent
+    window.updateRowsPerPageFromParent = function(newRowsPerPage) {
+        rowsPerPage = newRowsPerPage;
+        currentPage = 1; // Reset to first page
+        updateTable();
+    };
 
     function initializePagination() {
         allRows = Array.from(document.querySelectorAll('.report-row'));
         filteredRows = [...allRows];
         updateTable();
-    }
-
-    function changeRowsPerPage() {
-        rowsPerPage = parseInt(document.getElementById('repaymentRowsPerPage').value);
-        currentPage = 1;
-        updateTable();
-    }
-
-    function searchRepayments() {
-        searchTerm = document.getElementById('repaymentSearchInput').value.toLowerCase();
-        currentPage = 1;
-        applyFilters();
     }
 
     function applyFilters() {
@@ -205,15 +175,6 @@
 
             let showRow = true;
 
-            // Apply search filter
-            if (searchTerm !== '') {
-                const text = row.textContent.toLowerCase();
-                if (!text.includes(searchTerm)) {
-                    showRow = false;
-                }
-            }
-
-            // Apply dropdown filters
             if (selectedStatus && status !== selectedStatus) {
                 showRow = false;
             }
@@ -238,8 +199,6 @@
     function clearFilters() {
         $("#statusFilter").val("");
         $("#paymentDateFilter").val("");
-        document.getElementById('repaymentSearchInput').value = '';
-        searchTerm = '';
 
         filteredRows = [...allRows];
         currentPage = 1;
@@ -284,15 +243,15 @@
         paginationContainer.innerHTML = '';
 
         if (totalPages <= 1) {
-            const singleBtn = createBootstrapPaginationButton('1', 1, false, true);
+            const singleBtn = createPaginationButton('1', 1, false, true);
             paginationContainer.appendChild(singleBtn);
         } else {
             // First page button
-            const firstBtn = createBootstrapPaginationButton('«', 1, currentPage === 1);
+            const firstBtn = createPaginationButton('«', 1, currentPage === 1);
             paginationContainer.appendChild(firstBtn);
 
             // Previous page button
-            const prevBtn = createBootstrapPaginationButton('‹', currentPage - 1, currentPage === 1);
+            const prevBtn = createPaginationButton('‹', currentPage - 1, currentPage === 1);
             paginationContainer.appendChild(prevBtn);
 
             // Page number buttons
@@ -305,16 +264,16 @@
             }
 
             for (let i = startPage; i <= endPage; i++) {
-                const pageBtn = createBootstrapPaginationButton(i, i, false, i === currentPage);
+                const pageBtn = createPaginationButton(i, i, false, i === currentPage);
                 paginationContainer.appendChild(pageBtn);
             }
 
             // Next page button
-            const nextBtn = createBootstrapPaginationButton('›', currentPage + 1, currentPage === totalPages);
+            const nextBtn = createPaginationButton('›', currentPage + 1, currentPage === totalPages);
             paginationContainer.appendChild(nextBtn);
 
             // Last page button
-            const lastBtn = createBootstrapPaginationButton('»', totalPages, currentPage === totalPages);
+            const lastBtn = createPaginationButton('»', totalPages, currentPage === totalPages);
             paginationContainer.appendChild(lastBtn);
         }
 
@@ -332,7 +291,7 @@
         }
     }
 
-    function createBootstrapPaginationButton(text, page, disabled, active = false) {
+    function createPaginationButton(text, page, disabled, active = false) {
         const li = document.createElement('li');
         li.className = `page-item ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}`;
 
