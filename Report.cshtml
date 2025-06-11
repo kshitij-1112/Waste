@@ -34,6 +34,24 @@
         </div>
     </div>
 
+    <!-- Table Controls - Added between header and table -->
+    <div class="table-controls">
+        <div class="rows-control">
+            <label for="rowsPerPage">
+                <i class="fas fa-list-ol"></i>
+                Rows per page:
+            </label>
+            <select id="rowsPerPage" class="form-select" onchange="changeRowsPerPage()">
+                <option value="2">2</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+        <div class="controls-right">
+            <!-- Empty div to maintain layout structure -->
+        </div>
+    </div>
+
     <!-- Dynamic Report Container -->
     <div id="reportContainer">
         <!-- Reports will be loaded here -->
@@ -43,6 +61,7 @@
 <script>
     // Global variables
     let currentReportType = 'loan';
+    let rowsPerPage = 10; // Default rows per page
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -73,7 +92,24 @@
                         Error loading ${type} report. Please try again.
                     </div>
                 `);
+            } else {
+                // After loading, update the rows per page for the loaded report
+                setTimeout(() => {
+                    updateReportRowsPerPage();
+                }, 100);
             }
         });
+    }
+
+    function changeRowsPerPage() {
+        rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
+        updateReportRowsPerPage();
+    }
+
+    function updateReportRowsPerPage() {
+        // Update the rows per page in the currently loaded report
+        if (window.updateRowsPerPageFromParent) {
+            window.updateRowsPerPageFromParent(rowsPerPage);
+        }
     }
 </script>
