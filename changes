@@ -1,0 +1,15 @@
+in the full name section , only text can be there , only text can be entered and no special characters and numbers or numerical values .
+
+in email address , proper email should be there .
+
+in phone number , 10 numeric digits are compulsory . 10 numbers should be entered , else error .
+
+in upload identity proof , the files with .pdf , .png , .jpeg . extension can only be uploaded and not any other file . it should not upload any other file other than these extensions.
+
+in create password , minimum 8 and maximum 10 characters should be entered. else error.
+
+in confirm password , the characters should match with the create password , else error.
+
+none of the fields can go empty . all the fields are compulsory .
+
+take your time , analyze everything , and the make the changes . take how much ever time you want , just do everything correct . and give me back the whole individual files with the changes . make sure everything is correct.
