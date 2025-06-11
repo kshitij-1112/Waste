@@ -1,0 +1,508 @@
+@model List<BankLoanProject.Models.RepaymentScheduleViewModel>
+@{
+    ViewBag.Title = "Customer Repayment Portal";
+}
+
+<link rel="stylesheet" href="~/css/repayment.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h2>
+        <i class="fas fa-credit-card me-3"></i>
+        Loan Repayment Portal
+    </h2>
+    @* <p>Manage your loan repayments and check outstanding balances</p> *@
+</div>
+<h3 class="mt-5">Check Outstanding Balance</h3>
+
+<form asp-action="GetOutstandingBalance" asp-controller="Repayment" method="get" class="row g-3">
+    <div class="col-auto">
+        <label for="loanId" class="visually-hidden">Loan ID</label>
+        <input type="number" class="form-control" name="loanId" placeholder="Enter Loan ID" required />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-info mb-3">Get Balance</button>
+    </div>
+</form>
+
+@if (ViewBag.OutstandingBalance != null)
+{
+    <div class="alert alert-info mt-3">
+        <strong>Loan ID:</strong> @ViewBag.LoanId<br />
+        <strong>Outstanding Balance:</strong> @((decimal)ViewBag.OutstandingBalance)
+    </div>
+}
+
+<!-- Table Controls -->
+<div class="table-controls">
+    <div class="rows-control">
+        <label for="rowsPerPage">
+            <i class="fas fa-list-ol"></i>
+            Rows per page:
+        </label>
+        <select id="rowsPerPage" class="form-select" onchange="changeRowsPerPage()">
+            <option value="2">2</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+        </select>
+    </div>
+
+    <div class="controls-right">
+        <div class="input-group search-input-group">
+            <span class="input-group-text">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" class="form-control" id="searchInput" placeholder="Search repayments..." oninput="searchRepayments()">
+        </div>
+    </div>
+</div>
+
+<!-- Repayment Schedule Table -->
+<div class="table-container">
+    <div class="table-wrapper">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" class="col-repayment-id">Repayment ID</th>
+                    <th scope="col" class="col-loan-id">Loan ID</th>
+                    <th scope="col" class="col-product-type">Product Type</th>
+                    <th scope="col" class="col-product-name">Product Name</th>
+                    <th scope="col" class="col-due-date">Due Date</th>
+                    <th scope="col" class="col-amount-due">Amount Due</th>
+                    <th scope="col" class="col-payment-date">Payment Date</th>
+                    <th scope="col" class="col-status">Status</th>
+                    <th scope="col" class="col-action">Action</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                @foreach (var item in Model)
+                {
+                    <tr class="repayment-row" data-repayment-id="@item.RepaymentId">
+                        <td class="text-center">
+                            <span class="repayment-id">@item.RepaymentId</span>
+                        </td>
+                        <td class="text-center">
+                            <strong>@item.LoanId</strong>
+                        </td>
+                        <td class="text-center">@item.ProductType</td>
+                        <td class="text-center">@item.ProductName</td>
+                        <td class="text-center">@item.DueDate.ToString("dd-MM-yyyy")</td>
+                        <td class="text-center">
+                            <span class="amount">₹@(item.AmountDue?.ToString("N2") ?? "0.00")</span>
+                        </td>
+                        <td class="text-center">
+                            @if (item.PaymentDate.HasValue)
+                            {
+                                @item.PaymentDate.Value.ToString("dd-MM-yyyy")
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @{
+                                string statusClass = "";
+                                string statusIcon = "";
+                                switch (item.PaymentStatus?.ToUpper())
+                                {
+                                    case "PAID":
+                                    case "COMPLETED":
+                                        statusClass = "status-completed";
+                                        statusIcon = "fas fa-check-circle";
+                                        break;
+                                    case "PENDING":
+                                        statusClass = "status-pending";
+                                        statusIcon = "fas fa-clock";
+                                        break;
+                                    case "OVERDUE":
+                                        statusClass = "status-overdue";
+                                        statusIcon = "fas fa-exclamation-triangle";
+                                        break;
+                                    default:
+                                        statusClass = "status-pending";
+                                        statusIcon = "fas fa-clock";
+                                        break;
+                                }
+                            }
+                            <span class="status-badge @statusClass">
+                                <i class="@statusIcon"></i>@item.PaymentStatus
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            @if (item.PaymentStatus != "PAID" && item.PaymentStatus != "COMPLETED")
+                            {
+                                <button class="btn-pay" data-bs-toggle="modal" data-bs-target="#paymentModal"
+                                        data-repayment-id="@item.RepaymentId"
+                                        data-amount="@item.AmountDue"
+                                        data-loan-id="@item.LoanId"
+                                        data-due-date="@item.DueDate.ToString("dd-MM-yyyy")"
+                                        data-product-type="@item.ProductType"
+                                        data-product-name="@item.ProductName">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Pay Now</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    <i class="fas fa-check-circle me-1"></i>Paid
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Section -->
+    <div class="pagination-section">
+        <div class="pagination-info" id="paginationInfo">
+            <!-- Pagination info will be generated by JavaScript -->
+        </div>
+        <nav aria-label="Repayment pagination">
+            <ul class="pagination" id="paginationContainer">
+                <!-- Pagination buttons will be generated by JavaScript -->
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Enhanced Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">
+                    <i class="fas fa-credit-card me-2"></i>
+                    Make Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Payment Details Section -->
+                <div class="payment-details">
+                    <h6>
+                        <i class="fas fa-info-circle me-2"></i>
+                        Payment Details
+                    </h6>
+                    <div class="payment-info">
+                        <div class="payment-info-item">
+                            <span class="payment-info-label">
+                                <i class="fas fa-hashtag me-1"></i>Repayment ID:
+                            </span>
+                            <span class="payment-info-value" id="modalRepaymentId">-</span>
+                        </div>
+                        <div class="payment-info-item">
+                            <span class="payment-info-label">
+                                <i class="fas fa-key me-1"></i>Loan ID:
+                            </span>
+                            <span class="payment-info-value" id="modalLoanId">-</span>
+                        </div>
+                        <div class="payment-info-item">
+                            <span class="payment-info-label">
+                                <i class="fas fa-tag me-1"></i>Product Type:
+                            </span>
+                            <span class="payment-info-value" id="modalProductType">-</span>
+                        </div>
+                        <div class="payment-info-item">
+                            <span class="payment-info-label">
+                                <i class="fas fa-box me-1"></i>Product Name:
+                            </span>
+                            <span class="payment-info-value" id="modalProductName">-</span>
+                        </div>
+                        <div class="payment-info-item">
+                            <span class="payment-info-label">
+                                <i class="fas fa-calendar-alt me-1"></i>Due Date:
+                            </span>
+                            <span class="payment-info-value" id="modalDueDate">-</span>
+                        </div>
+                        <div class="payment-info-item">
+                            <span class="payment-info-label">
+                                <i class="fas fa-rupee-sign me-1"></i>Amount Due:
+                            </span>
+                            <span class="payment-info-value" id="modalAmount">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <form id="paymentForm" method="post" asp-action="Pay" asp-controller="Repayment">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="repaymentId" id="repaymentId" />
+                    <!-- Hidden inputs to preserve pagination state -->
+                    <input type="hidden" name="currentPage" class="current-page-input" value="1" />
+                    <input type="hidden" name="rowsPerPage" class="rows-per-page-input" value="2" />
+                    <input type="hidden" name="searchTerm" class="search-term-input" value="" />
+
+                    <div class="form-group">
+                        <label for="paymentMethod">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Payment Method
+                        </label>
+                        <select id="paymentMethod" name="paymentMethod" class="form-select" required>
+                            <option value="">-- Select Payment Method --</option>
+                            <option value="UPI">
+                                <i class="fas fa-mobile-alt"></i> UPI Payment
+                            </option>
+                            <option value="NetBanking">
+                                <i class="fas fa-university"></i> Net Banking
+                            </option>
+                            <option value="Card">
+                                <i class="fas fa-credit-card"></i> Credit/Debit Card
+                            </option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="submit" form="paymentForm" class="btn-confirm">
+                    <i class="fas fa-check-circle me-2"></i>Confirm Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Global variables for pagination and search
+        let currentPage = 1;
+        let rowsPerPage = 2;
+        let allRows = [];
+        let filteredRows = [];
+        let searchTerm = '';
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            restorePaginationState();
+            initializeTable();
+            initializeModal();
+            initializePaymentFormHandlers();
+        });
+
+        function restorePaginationState() {
+            // Restore pagination state from URL parameters or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const savedPage = urlParams.get('currentPage') || localStorage.getItem('customer-currentPage') || '1';
+            const savedRowsPerPage = urlParams.get('rowsPerPage') || localStorage.getItem('customer-rowsPerPage') || '2';
+            const savedSearchTerm = urlParams.get('searchTerm') || localStorage.getItem('customer-searchTerm') || '';
+
+            currentPage = parseInt(savedPage);
+            rowsPerPage = parseInt(savedRowsPerPage);
+            searchTerm = savedSearchTerm;
+
+            // Update UI elements
+            document.getElementById('rowsPerPage').value = rowsPerPage;
+            document.getElementById('searchInput').value = searchTerm;
+        }
+
+        function savePaginationState() {
+            // Save current state to localStorage
+            localStorage.setItem('customer-currentPage', currentPage);
+            localStorage.setItem('customer-rowsPerPage', rowsPerPage);
+            localStorage.setItem('customer-searchTerm', searchTerm);
+        }
+
+        function initializeTable() {
+            allRows = Array.from(document.querySelectorAll('.repayment-row'));
+            filteredRows = [...allRows];
+            applyFilters();
+            updateTable();
+        }
+
+        function initializeModal() {
+            const paymentModal = document.getElementById('paymentModal');
+            paymentModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const repaymentId = button.getAttribute('data-repayment-id');
+                const amount = button.getAttribute('data-amount');
+                const loanId = button.getAttribute('data-loan-id');
+                const dueDate = button.getAttribute('data-due-date');
+                const productType = button.getAttribute('data-product-type');
+                const productName = button.getAttribute('data-product-name');
+
+                // Update modal content
+                document.getElementById('repaymentId').value = repaymentId;
+                document.getElementById('modalRepaymentId').textContent = '#' + repaymentId;
+                document.getElementById('modalLoanId').textContent = loanId;
+                document.getElementById('modalProductType').textContent = productType;
+                document.getElementById('modalProductName').textContent = productName;
+                document.getElementById('modalDueDate').textContent = dueDate;
+                document.getElementById('modalAmount').textContent = '₹' + parseFloat(amount).toLocaleString('en-IN', {minimumFractionDigits: 2});
+            });
+        }
+
+        function initializePaymentFormHandlers() {
+            const paymentForm = document.getElementById('paymentForm');
+            
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', function(e) {
+                    // Save current pagination state before submission
+                    savePaginationState();
+                    
+                    // Update hidden form inputs with current state
+                    paymentForm.querySelector('.current-page-input').value = currentPage;
+                    paymentForm.querySelector('.rows-per-page-input').value = rowsPerPage;
+                    paymentForm.querySelector('.search-term-input').value = searchTerm;
+                });
+            }
+        }
+
+        function applyFilters() {
+            let rows = [...allRows];
+
+            // Apply search filter
+            searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm !== '') {
+                rows = rows.filter(row => {
+                    const text = row.textContent.toLowerCase();
+                    return text.includes(searchTerm);
+                });
+            }
+
+            filteredRows = rows;
+        }
+
+        function updateTable() {
+            // Hide all rows first
+            allRows.forEach(row => row.style.display = 'none');
+
+            // Calculate pagination
+            const totalRows = filteredRows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+            
+            // Ensure currentPage is within valid range
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+            
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, totalRows);
+
+            // Show current page rows
+            for (let i = startIndex; i < endIndex; i++) {
+                if (filteredRows[i]) {
+                    filteredRows[i].style.display = '';
+                }
+            }
+
+            // Update pagination controls
+            updatePagination(totalPages, totalRows, startIndex, endIndex);
+            
+            // Save current state
+            savePaginationState();
+        }
+
+        function updatePagination(totalPages, totalRows, startIndex, endIndex) {
+            const paginationContainer = document.getElementById('paginationContainer');
+            const paginationInfo = document.getElementById('paginationInfo');
+
+            // Clear existing pagination
+            paginationContainer.innerHTML = '';
+
+            if (totalPages <= 1) {
+                const singleBtn = createBootstrapPaginationButton('1', 1, false, true);
+                paginationContainer.appendChild(singleBtn);
+            } else {
+                // First page button
+                const firstBtn = createBootstrapPaginationButton('«', 1, currentPage === 1);
+                paginationContainer.appendChild(firstBtn);
+
+                // Previous page button
+                const prevBtn = createBootstrapPaginationButton('‹', currentPage - 1, currentPage === 1);
+                paginationContainer.appendChild(prevBtn);
+
+                // Page number buttons
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = createBootstrapPaginationButton(i, i, false, i === currentPage);
+                    paginationContainer.appendChild(pageBtn);
+                }
+
+                // Next page button
+                const nextBtn = createBootstrapPaginationButton('›', currentPage + 1, currentPage === totalPages);
+                paginationContainer.appendChild(nextBtn);
+
+                // Last page button
+                const lastBtn = createBootstrapPaginationButton('»', totalPages, currentPage === totalPages);
+                paginationContainer.appendChild(lastBtn);
+            }
+
+            // Update pagination info
+            if (totalRows > 0) {
+                paginationInfo.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    Showing ${startIndex + 1} to ${endIndex} of ${totalRows} entries
+                `;
+            } else {
+                paginationInfo.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    No matching records found
+                `;
+            }
+        }
+
+        function createBootstrapPaginationButton(text, page, disabled, active = false) {
+            const li = document.createElement('li');
+            li.className = `page-item ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}`;
+
+            const button = document.createElement('a');
+            button.className = 'page-link';
+            button.innerHTML = text;
+            button.href = '#';
+
+            if (!disabled) {
+                button.onclick = (e) => {
+                    e.preventDefault();
+                    goToPage(page);
+                };
+            }
+
+            li.appendChild(button);
+            return li;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updateTable();
+        }
+
+        function changeRowsPerPage() {
+            rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
+            currentPage = 1;
+            updateTable();
+        }
+
+        function searchRepayments() {
+            currentPage = 1;
+            applyFilters();
+            updateTable();
+        }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function(event) {
+            restorePaginationState();
+            applyFilters();
+            updateTable();
+        });
+    </script>
+}
